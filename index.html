@@ -467,6 +467,35 @@
     .btn-orange { background-color: var(--btn-orange); border-color: var(--btn-orange); }
     .btn-orange:hover { background-color: var(--btn-orange-hover); }
 
+    /* Style Tombol Paginasi */
+    .page-btn {
+      background: #ffffff;
+      color: var(--text-main);
+      border: 1.5px solid var(--border-dark);
+      border-radius: 4px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      background: var(--table-header-bg);
+      border-color: var(--accent-indigo);
+    }
+
+    .page-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .page-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
     /* Total Section Modern & Catatan Sejajar */
     .total-box-container {
       display: flex;
@@ -666,7 +695,8 @@
       .btn-del-column, 
       .button-group, 
       .section-card, 
-      .search-box {
+      .search-box,
+      #paginationContainer {
         display: none !important;
       }
 
@@ -970,7 +1000,8 @@
     body.is-thermal-print .section-card,
     body.is-thermal-print .btn-add-row,
     body.is-thermal-print .btn-del-column,
-    body.is-thermal-print .button-group {
+    body.is-thermal-print .button-group,
+    body.is-thermal-print #paginationContainer {
       display: none !important;
     }
 
@@ -1127,7 +1158,7 @@
       </div>
 
       <div class="search-box">
-        <input type="text" id="searchInput" onkeyup="tampilkanData()" placeholder="Cari berdasarkan No. Invoice, Pelanggan, atau Nama Barang...">
+        <input type="text" id="searchInput" onkeyup="tampilkanData(1)" placeholder="Cari berdasarkan No. Invoice, Pelanggan, atau Nama Barang...">
       </div>
 
       <div class="table-container">
@@ -1147,6 +1178,12 @@
           <tbody id="tabelSimpan">
           </tbody>
         </table>
+      </div>
+
+      <!-- KONTROL PAGINASI -->
+      <div id="paginationContainer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; gap: 10px; flex-wrap: wrap;">
+        <div id="paginationInfo" style="font-size: 12px; color: var(--text-muted); font-weight: 600;"></div>
+        <div id="paginationButtons" style="display: flex; gap: 4px; align-items: center;"></div>
       </div>
     </div>
 
@@ -1212,6 +1249,10 @@
 
     let editIndexNo = null;
     let editingMasterKode = null;
+
+    // Variabel Global Paginasi
+    let currentPage = 1;
+    const rowsPerPage = 10;
 
     const COLOR_PRIMARY = '0F172A';
     const COLOR_HEADER = '0F172A';
@@ -1645,7 +1686,7 @@
         alert("Gagal menyimpan ke Cloud Supabase: " + error.message);
       } else {
         alert("Data Invoice berhasil disimpan di Cloud!");
-        tampilkanData();
+        tampilkanData(1);
         resetForm();
       }
     }
@@ -1686,35 +1727,64 @@
       resetForm();
     }
 
-    /* INTEGRASI SUPABASE: TAMPILKAN INVOICE */
-    async function tampilkanData() {
+    /* INTEGRASI SUPABASE & PAGINASI: TAMPILKAN INVOICE */
+    async function tampilkanData(page = 1) {
+      currentPage = page;
       const tbody = document.getElementById('tabelSimpan');
       const keyword = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
 
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      let query = supabaseClient.from('invoices').select('*').order('created_at', { ascending: false });
-      
-      if (keyword) {
-        query = query.or(`no_invoice.ilike.%${keyword}%,pelanggan.ilike.%${keyword}%`);
-      }
+      let { data: listData, error } = await supabaseClient
+        .from('invoices')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      const { data: listData, error } = await query;
-
-      if (error || !listData || listData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center" style="color: var(--text-muted); padding: 12px;">Belum ada data tersimpan di Cloud</td></tr>';
+      if (error || !listData) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center" style="color: var(--btn-red); padding: 12px;">Gagal memuat data dari Cloud!</td></tr>';
+        renderPagination(0, 1);
         return;
       }
 
-      listData.forEach((item, index) => {
+      // Filter Data berdasarkan Pencarian
+      if (keyword) {
+        listData = listData.filter(item => {
+          const noInv = (item.no_invoice || '').toLowerCase();
+          const pel = (item.pelanggan || '').toLowerCase();
+          let rincianText = '';
+          if (item.items && Array.isArray(item.items)) {
+            rincianText = item.items.map(i => `${i.kodeBarang || ''} ${i.namaBarang || ''}`).join(' ').toLowerCase();
+          }
+          return noInv.includes(keyword) || pel.includes(keyword) || rincianText.includes(keyword);
+        });
+      }
+
+      const totalItems = listData.length;
+      const totalPages = Math.ceil(totalItems / rowsPerPage) || 1;
+
+      // Validasi Batas Halaman
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      // Ambil 10 data untuk halaman aktif
+      const startIndex = (currentPage - 1) * rowsPerPage;
+      const pageData = listData.slice(startIndex, startIndex + rowsPerPage);
+
+      if (pageData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center" style="color: var(--text-muted); padding: 12px;">Belum ada data tersimpan di Cloud</td></tr>';
+        renderPagination(0, 1);
+        return;
+      }
+
+      pageData.forEach((item, index) => {
         const rincianItems = (item.items || []).map(i => {
           const kodeText = i.kodeBarang ? `<span class="badge-code">${i.kodeBarang}</span> ` : '';
-          return `${kodeText}${i.namaBarang} (${i.qty} x Rp ${Number(i.hargaSatuan).toLocaleString('id-ID')})`;
+          return `${kodeText}${i.namaBarang} (${i.qty} x Rp ${Number(i.hargaSatuan || 0).toLocaleString('id-ID')})`;
         }).join('<br>');
 
         const row = `<tr>
-          <td class="text-center">${index + 1}</td>
+          <td class="text-center">${startIndex + index + 1}</td>
           <td style="font-weight: 700; color: var(--text-main); white-space: nowrap;">${item.no_invoice || '-'}</td>
           <td style="white-space: nowrap;">${item.tgl_nota || '-'}</td>
           <td style="font-weight: 600;">${item.pelanggan || '-'}</td>
@@ -1731,6 +1801,41 @@
         </tr>`;
         tbody.innerHTML += row;
       });
+
+      renderPagination(totalItems, totalPages);
+    }
+
+    /* RENDER TOMBOL PAGINASI */
+    function renderPagination(totalItems, totalPages) {
+      const infoContainer = document.getElementById('paginationInfo');
+      const btnContainer = document.getElementById('paginationButtons');
+
+      if (!infoContainer || !btnContainer) return;
+
+      if (totalItems === 0) {
+        infoContainer.innerText = 'Menampilkan 0 data';
+        btnContainer.innerHTML = '';
+        return;
+      }
+
+      const start = (currentPage - 1) * rowsPerPage + 1;
+      const end = Math.min(currentPage * rowsPerPage, totalItems);
+      infoContainer.innerText = `Menampilkan ${start}-${end} dari ${totalItems} Invoice`;
+
+      let htmlBtns = '';
+
+      // Tombol Previous
+      htmlBtns += `<button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="tampilkanData(${currentPage - 1})">← Prev</button>`;
+
+      // Tombol Angka Halaman (Loncat ke halaman tujuan)
+      for (let i = 1; i <= totalPages; i++) {
+        htmlBtns += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="tampilkanData(${i})">${i}</button>`;
+      }
+
+      // Tombol Next
+      htmlBtns += `<button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="tampilkanData(${currentPage + 1})">Next →</button>`;
+
+      btnContainer.innerHTML = htmlBtns;
     }
 
     async function generateFormExcel(data, filename) {
@@ -1953,7 +2058,7 @@
           if (payload.length > 0) {
             const { error } = await supabaseClient.from('invoices').upsert(payload);
             if (!error) {
-              tampilkanData();
+              tampilkanData(1);
               alert(`Berhasil mengimpor ${payload.length} data Invoice ke Cloud!`);
             }
           }
@@ -1974,7 +2079,7 @@
         if (editIndexNo === noInvoice) {
           resetForm();
         }
-        tampilkanData();
+        tampilkanData(currentPage);
       }
     }
 
@@ -1982,7 +2087,7 @@
       if (confirm("Yakin ingin menghapus seluruh data Invoice di Cloud?")) {
         await supabaseClient.from('invoices').delete().neq('no_invoice', '');
         resetForm();
-        tampilkanData();
+        tampilkanData(1);
       }
     }
 
@@ -1990,7 +2095,7 @@
       checkSession();
       renderMasterDatalist();
       tambahBarisItem();
-      tampilkanData();
+      tampilkanData(1);
       generateNoInvoice();
     };
   </script>
