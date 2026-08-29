@@ -563,6 +563,34 @@
       font-weight: 800;
     }
 
+    /* Total Pendapatan Box pada Bagian Kanan Bawah Tabel Rekap */
+    .total-pendapatan-box {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+      margin-top: -8px;
+      margin-bottom: 12px;
+      padding: 10px 16px;
+      background: var(--table-header-bg);
+      border: 1.5px solid var(--border-dark);
+      border-radius: 4px;
+      font-size: 13px;
+      color: var(--text-main);
+    }
+
+    .total-pendapatan-box .label {
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .total-pendapatan-box .value {
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--btn-green);
+    }
+
     /* Footer & Signatures Modern */
     .footer-section {
       display: flex;
@@ -696,6 +724,7 @@
       .button-group, 
       .section-card, 
       .search-box,
+      .total-pendapatan-box,
       #paginationContainer {
         display: none !important;
       }
@@ -1001,6 +1030,7 @@
     body.is-thermal-print .btn-add-row,
     body.is-thermal-print .btn-del-column,
     body.is-thermal-print .button-group,
+    body.is-thermal-print .total-pendapatan-box,
     body.is-thermal-print #paginationContainer {
       display: none !important;
     }
@@ -1178,6 +1208,12 @@
           <tbody id="tabelSimpan">
           </tbody>
         </table>
+      </div>
+
+      <!-- TOTAL PENDAPATAN (DI KANAN BAWAH TABEL) -->
+      <div class="total-pendapatan-box">
+        <span class="label">Total Pendapatan:</span>
+        <span class="value" id="displayTotalPendapatan">Rp 0</span>
       </div>
 
       <!-- KONTROL PAGINASI -->
@@ -1743,7 +1779,7 @@
 
       if (error || !listData) {
         tbody.innerHTML = '<tr><td colspan="8" class="text-center" style="color: var(--btn-red); padding: 12px;">Gagal memuat data dari Cloud!</td></tr>';
-        renderPagination(0, 1);
+        renderPagination(0, 1, 0);
         return;
       }
 
@@ -1760,6 +1796,9 @@
         });
       }
 
+      // Hitung Total Pendapatan dari Seluruh Data yang Terfilter
+      const totalPendapatan = listData.reduce((acc, item) => acc + (parseFloat(item.total_bayar) || 0), 0);
+
       const totalItems = listData.length;
       const totalPages = Math.ceil(totalItems / rowsPerPage) || 1;
 
@@ -1773,7 +1812,7 @@
 
       if (pageData.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" class="text-center" style="color: var(--text-muted); padding: 12px;">Belum ada data tersimpan di Cloud</td></tr>';
-        renderPagination(0, 1);
+        renderPagination(0, 1, 0);
         return;
       }
 
@@ -1802,13 +1841,18 @@
         tbody.innerHTML += row;
       });
 
-      renderPagination(totalItems, totalPages);
+      renderPagination(totalItems, totalPages, totalPendapatan);
     }
 
-    /* RENDER TOMBOL PAGINASI */
-    function renderPagination(totalItems, totalPages) {
+    /* RENDER TOMBOL PAGINASI & UPDATE TOTAL PENDAPATAN */
+    function renderPagination(totalItems, totalPages, totalPendapatan = 0) {
       const infoContainer = document.getElementById('paginationInfo');
       const btnContainer = document.getElementById('paginationButtons');
+      const pendapatanDisplay = document.getElementById('displayTotalPendapatan');
+
+      if (pendapatanDisplay) {
+        pendapatanDisplay.innerText = 'Rp ' + totalPendapatan.toLocaleString('id-ID');
+      }
 
       if (!infoContainer || !btnContainer) return;
 
