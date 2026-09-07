@@ -16,12 +16,10 @@
   <!-- SheetJS (XLSX) for Reading/Importing Excel Files -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   
-  <!-- Supabase JS Client Integration -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- SCRIPT INTEGRASI GOOGLE APPS SCRIPT -->
   <script>
-    const SUPABASE_URL = 'https://xsziscawjmtzgmpmkjmx.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_464uu30YFiuyyoBfItBx8Q_gmCjgsrO';
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // PASTE URL GOOGLE APPS SCRIPT WEB APP ANDA DI SINI
+    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby3Gytqupazw7GqYTgXe1Jl61GMSbf0OcAkGGdBuuOjKCImwULdvy2nSnE4MoK4zuXOog/exec';
   </script>
 
   <style>
@@ -37,6 +35,7 @@
       --primary-hover: #1e293b;
       --accent-indigo: #4338ca;
       --table-header-bg: #f8fafc;
+      --table-row-even: #fafafa;
       --btn-green: #16a34a;
       --btn-green-hover: #15803d;
       --btn-indigo: #4f46e5;
@@ -45,6 +44,26 @@
       --btn-red-hover: #b91c1c;
       --btn-orange: #d97706;
       --btn-orange-hover: #b45309;
+      --input-bg: #ffffff;
+      --watermark-opacity: 0.04;
+    }
+
+    /* Dark Mode Variable Override */
+    body.dark-mode {
+      --bg-page: #0f172a;
+      --card-bg: #1e293b;
+      --border-dark: #475569;
+      --border-medium: #64748b;
+      --border-light: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-hover: #0284c7;
+      --accent-indigo: #818cf8;
+      --table-header-bg: #0f172a;
+      --table-row-even: #182232;
+      --input-bg: #0f172a;
+      --watermark-opacity: 0.08;
     }
 
     * {
@@ -62,9 +81,9 @@
       margin: 0;
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    /* Modal Overlay Login */
     .login-overlay {
       position: fixed;
       top: 0;
@@ -84,13 +103,14 @@
     }
 
     .login-card {
-      background: #ffffff;
+      background: var(--card-bg);
       border: 2px solid var(--border-dark);
       border-radius: 8px;
       padding: 32px;
       width: 100%;
       max-width: 380px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      color: var(--text-main);
     }
 
     .login-header {
@@ -124,6 +144,24 @@
       text-align: center;
     }
 
+    .remember-me-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    .remember-me-group input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: var(--btn-indigo);
+    }
+
     .bg-selector-container {
       margin-top: 20px;
       padding-top: 14px;
@@ -154,25 +192,45 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: var(--primary);
+      background: #0f172a;
       color: #ffffff;
       padding: 10px 16px;
       border-radius: 6px;
       margin-bottom: 16px;
       font-size: 13px;
+      border: 1px solid var(--border-dark);
     }
 
     .user-info span { font-weight: 700; }
 
     .role-badge {
       background: #ffffff;
-      color: var(--primary);
+      color: #0f172a;
       padding: 2px 8px;
       border-radius: 4px;
       font-size: 11px;
       font-weight: 800;
       text-transform: uppercase;
       margin-left: 6px;
+    }
+
+    .theme-toggle-btn {
+      background: var(--card-bg);
+      color: var(--text-main);
+      border: 1px solid var(--border-medium);
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      border-color: var(--primary);
     }
 
     .app-wrapper {
@@ -191,6 +249,7 @@
       box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
       position: relative;
       overflow: hidden;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     .card-watermark::before {
@@ -201,8 +260,8 @@
       transform: translate(-50%, -50%) rotate(-25deg);
       font-size: 110px;
       font-weight: 900;
-      color: #0f172a;
-      opacity: 0.04;
+      color: var(--text-main);
+      opacity: var(--watermark-opacity);
       pointer-events: none;
       user-select: none;
       z-index: 0;
@@ -264,7 +323,7 @@
       border: 1.5px solid var(--border-dark);
       border-radius: 4px;
       padding: 6px 10px;
-      background: #ffffff;
+      background: var(--input-bg);
       color: var(--text-main);
       outline: none;
     }
@@ -300,7 +359,7 @@
       border-radius: 4px;
       outline: none;
       font-size: 13px;
-      background: #ffffff;
+      background: var(--input-bg);
       color: var(--text-main);
       font-weight: 600;
       padding: 8px 10px;
@@ -351,9 +410,10 @@
       border: 1px solid var(--border-light);
       padding: 6px 8px;
       vertical-align: middle;
+      color: var(--text-main);
     }
 
-    .modern-table tr:nth-child(even) { background-color: #fafafa; }
+    .modern-table tr:nth-child(even) { background-color: var(--table-row-even); }
 
     .modern-table input {
       width: 100%;
@@ -362,7 +422,8 @@
       padding: 6px 8px;
       font-size: 13px;
       outline: none;
-      background: #ffffff;
+      background: var(--input-bg);
+      color: var(--text-main);
       font-weight: 500;
     }
 
@@ -374,7 +435,7 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      background-color: var(--primary);
+      background-color: var(--btn-indigo);
       color: #ffffff;
       border: 1.5px solid var(--border-dark);
       border-radius: 4px;
@@ -387,16 +448,20 @@
       transition: all 0.15s ease;
     }
 
-    .btn:hover { background-color: var(--primary-hover); }
+    .btn:hover { background-color: var(--btn-indigo-hover); }
 
     .btn-secondary {
-      background: #ffffff;
+      background: var(--card-bg);
       color: var(--text-main);
       border: 1.5px solid var(--border-dark);
     }
 
+    .btn-secondary:hover {
+      background: var(--table-header-bg);
+    }
+
     .btn-add-row {
-      background-color: #ffffff;
+      background-color: var(--card-bg);
       color: var(--text-main);
       border: 1.5px dashed var(--border-dark);
       border-radius: 4px;
@@ -407,7 +472,7 @@
     }
 
     .btn-del-row {
-      background-color: #ffffff;
+      background-color: transparent;
       color: var(--btn-red);
       border: 1px solid var(--btn-red);
       border-radius: 3px;
@@ -418,12 +483,16 @@
     }
 
     .btn-green { background-color: var(--btn-green); border-color: var(--btn-green); }
+    .btn-green:hover { background-color: var(--btn-green-hover); }
     .btn-indigo { background-color: var(--btn-indigo); border-color: var(--btn-indigo); }
+    .btn-indigo:hover { background-color: var(--btn-indigo-hover); }
     .btn-red { background-color: var(--btn-red); border-color: var(--btn-red); }
+    .btn-red:hover { background-color: var(--btn-red-hover); }
     .btn-orange { background-color: var(--btn-orange); border-color: var(--btn-orange); }
+    .btn-orange:hover { background-color: var(--btn-orange-hover); }
 
     .page-btn {
-      background: #ffffff;
+      background: var(--card-bg);
       color: var(--text-main);
       border: 1.5px solid var(--border-dark);
       border-radius: 4px;
@@ -433,9 +502,15 @@
       cursor: pointer;
     }
 
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .page-btn.active {
-      background: var(--primary);
+      background: var(--btn-indigo);
       color: #ffffff;
+      border-color: var(--btn-indigo);
     }
 
     .total-box-container {
@@ -470,7 +545,7 @@
 
     .total-card {
       width: 320px;
-      background: #ffffff;
+      background: var(--card-bg);
       border: 1.5px solid var(--border-dark);
       border-radius: 4px;
       padding: 16px 20px;
@@ -558,11 +633,13 @@
       border: 1px solid var(--border-dark);
       border-radius: 4px;
       outline: none;
+      background: var(--input-bg);
+      color: var(--text-main);
     }
 
     .badge-code {
-      background: #f1f5f9;
-      color: #0f172a;
+      background: var(--table-header-bg);
+      color: var(--text-main);
       padding: 2px 6px;
       font-family: monospace;
       font-weight: 700;
@@ -570,34 +647,35 @@
       border-radius: 3px;
     }
 
-    /* STANDARD A4 PRINT STYLES */
     @media print {
       body {
-        background-color: var(--bg-page) !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
         padding: 0 !important;
         margin: 0 !important;
       }
-      .user-bar, .btn-add-row, .btn-del-column, .button-group, .section-card, .search-box, .total-pendapatan-box, #paginationContainer {
+      .user-bar, .btn-add-row, .btn-del-column, .button-group, .section-card, .search-box, .total-pendapatan-box, #paginationContainer, #paginationMasterContainer {
         display: none !important;
       }
       .app-wrapper { max-width: 100% !important; gap: 0 !important; }
       .card {
-        background: var(--card-bg) !important;
-        border: 1.5px solid var(--border-dark) !important;
+        background: #ffffff !important;
+        border: 1.5px solid #000000 !important;
         padding: 24px !important;
         box-shadow: none !important;
+        color: #000000 !important;
       }
       .invoice-no-box input, .form-control, .modern-table input {
         border: none !important;
         background: transparent !important;
         padding: 0 !important;
+        color: #000000 !important;
       }
       @page { margin: 10mm; }
     }
 
-    /* STYLING PRINT THERMAL 58MM STANDAR POS */
     body.is-thermal-print {
       background: #ffffff !important;
       color: #000000 !important;
@@ -618,6 +696,7 @@
     body.is-thermal-print .button-group,
     body.is-thermal-print .total-pendapatan-box,
     body.is-thermal-print #paginationContainer,
+    body.is-thermal-print #paginationMasterContainer,
     body.is-thermal-print .card-watermark::before,
     body.is-thermal-print .modern-table th {
       display: none !important;
@@ -637,9 +716,9 @@
       padding: 0 !important;
       width: 100% !important;
       background: #ffffff !important;
+      color: #000000 !important;
     }
 
-    /* Header Toko Struk Pembayaran */
     body.is-thermal-print .header-banner {
       display: flex !important;
       flex-direction: column !important;
@@ -695,7 +774,6 @@
       font-family: inherit !important;
     }
 
-    /* Info Tanggal & Pelanggan */
     body.is-thermal-print .info-grid {
       display: flex !important;
       flex-direction: column !important;
@@ -738,7 +816,6 @@
       width: auto !important;
     }
 
-    /* Daftar Item Format POS Struk Kasir */
     body.is-thermal-print .table-container {
       border: none !important;
       margin-bottom: 4px !important;
@@ -776,6 +853,7 @@
       margin-bottom: 2px !important;
       padding: 0 !important;
       border: none !important;
+      color: #000000 !important;
     }
 
     body.is-thermal-print .modern-table td:nth-child(1),
@@ -799,6 +877,7 @@
       font-weight: 700 !important;
       padding: 0 !important;
       border: none !important;
+      color: #000000 !important;
     }
 
     body.is-thermal-print .modern-table input {
@@ -862,6 +941,7 @@
       border-right: none !important;
       border-radius: 0 !important;
       text-align: center !important;
+      color: #000000 !important;
     }
 
     body.is-thermal-print .notes-box strong {
@@ -912,14 +992,17 @@
           <label for="loginUsername">Username</label>
           <input type="text" id="loginUsername" class="form-control" placeholder="Masukkan username" required autocomplete="off">
         </div>
-        <div class="form-group" style="margin-bottom: 20px;">
+        <div class="form-group" style="margin-bottom: 14px;">
           <label for="loginPassword">Password</label>
           <input type="password" id="loginPassword" class="form-control" placeholder="Masukkan password" required>
         </div>
+        <label class="remember-me-group">
+          <input type="checkbox" id="rememberMe">
+          <span>Ingat Saya</span>
+        </label>
         <button type="submit" class="btn btn-indigo" style="width: 100%;">Masuk Aplikasi</button>
       </form>
 
-      <!-- BAGIAN FITUR GANTI BACKGROUND LOGIN -->
       <div class="bg-selector-container">
         <label>Ganti Background Login:</label>
         <div class="bg-selector-btns">
@@ -941,17 +1024,20 @@
     <div class="user-info">
       Pengguna: <span id="displayUsername">-</span> <span class="role-badge" id="displayRole">-</span>
     </div>
-    <button class="btn btn-red" style="padding: 4px 10px; font-size: 11px;" onclick="prosesLogout()">Logout</button>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" id="themeToggleBtn">
+        <span id="themeIcon">🌙</span> <span id="themeText">Mode Gelap</span>
+      </button>
+      <button class="btn btn-red" style="padding: 4px 10px; font-size: 11px;" onclick="prosesLogout()">Logout</button>
+    </div>
   </div>
 
-  <!-- Datatables Auto-complete lists -->
   <datalist id="listKodeBarangMaster"></datalist>
   <datalist id="listNamaBarangMaster"></datalist>
 
   <div class="app-wrapper">
     <!-- Main Invoice Card -->
     <div class="card card-watermark">
-      <!-- Header Banner -->
       <div class="header-banner">
         <div class="logo-container">
           <img src="warobh-logo.png" alt="Warobh Percetakan Digital" class="logo-left-img">
@@ -965,7 +1051,6 @@
         </div>
       </div>
 
-      <!-- Form Information -->
       <div class="info-grid">
         <div class="form-group">
           <label for="tglNota">Tanggal Nota</label>
@@ -977,7 +1062,6 @@
         </div>
       </div>
 
-      <!-- Table Items -->
       <div class="table-container">
         <table class="modern-table" id="tabelBarang">
           <thead>
@@ -992,14 +1076,12 @@
             </tr>
           </thead>
           <tbody id="tbodyItems">
-            <!-- Dynamic Rows -->
           </tbody>
         </table>
       </div>
 
       <button type="button" class="btn btn-add-row" onclick="tambahBarisItem()">+ Tambah Item Barang</button>
 
-      <!-- Totals & Notes Section -->
       <div class="total-box-container">
         <div class="notes-box">
           <strong>Catatan:</strong>
@@ -1022,7 +1104,6 @@
         </div>
       </div>
 
-      <!-- Footer Section -->
       <div class="footer-section">
         <div class="signature-container">
           <div class="signature-box">
@@ -1049,7 +1130,7 @@
     <!-- Saved Invoices History Card (Admin Only) -->
     <div class="card section-card admin-only">
       <div class="section-header">
-        <h3>Daftar Invoice Tersimpan (Cloud)</h3>
+        <h3>Daftar Invoice Tersimpan (Google Sheets)</h3>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <label for="fileImportExcel" class="btn btn-secondary" style="cursor: pointer;">Import Invoice Excel</label>
           <input type="file" id="fileImportExcel" accept=".xlsx, .xls, .csv" style="display:none;" onchange="importExcelData(event)">
@@ -1095,10 +1176,11 @@
     <!-- Master Database Barang Card (Admin Only) -->
     <div class="card section-card admin-only">
       <div class="section-header">
-        <h3>Master Database Barang (Cloud)</h3>
+        <h3>Master Database Barang (Google Sheets)</h3>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <label for="fileImportMaster" class="btn btn-secondary" style="cursor: pointer;">Import Master Excel</label>
           <input type="file" id="fileImportMaster" accept=".xlsx, .xls, .csv" style="display:none;" onchange="importMasterExcel(event)">
+          <button class="btn btn-indigo" onclick="exportMasterExcel()">Export Master Excel</button>
           <button class="btn btn-red" onclick="hapusMasterData()">Kosongkan Master</button>
         </div>
       </div>
@@ -1123,7 +1205,7 @@
       </div>
 
       <div class="search-box">
-        <input type="text" id="searchMasterInput" onkeyup="renderMasterDatalist()" placeholder="Cari Kode atau Nama Barang di Master Database...">
+        <input type="text" id="searchMasterInput" onkeyup="tampilkanMasterData(1)" placeholder="Cari Kode atau Nama Barang di Master Database...">
       </div>
 
       <div class="table-container">
@@ -1141,6 +1223,11 @@
           </tbody>
         </table>
       </div>
+
+      <div id="paginationMasterContainer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; gap: 10px; flex-wrap: wrap;">
+        <div id="paginationMasterInfo" style="font-size: 12px; color: var(--text-muted); font-weight: 600;"></div>
+        <div id="paginationMasterButtons" style="display: flex; gap: 4px; align-items: center;"></div>
+      </div>
     </div>
   </div>
 
@@ -1156,11 +1243,62 @@
     let currentPage = 1;
     const rowsPerPage = 10;
 
+    let currentMasterPage = 1;
+    const masterRowsPerPage = 15;
+
+    let localMasterBarang = [];
+    let localInvoices = [];
+
     const COLOR_PRIMARY = '0F172A';
     const COLOR_HEADER = '0F172A';
     const COLOR_STRIPE = 'F8FAFC';
 
-    // --- FUNGSI GANTI & SIMPAN BACKGROUND LOGIN ---
+    // Helper FUNGSI API GOOGLE APPS SCRIPT
+    async function apiGet(action) {
+      const res = await fetch(`${GAS_WEB_APP_URL}?action=${action}`);
+      return await res.json();
+    }
+
+    async function apiPost(data) {
+      const res = await fetch(GAS_WEB_APP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(data)
+      });
+      return await res.json();
+    }
+
+    // MODE TERANG DAN GELAP
+    function initTheme() {
+      const savedTheme = localStorage.getItem('warobh_theme');
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        updateThemeUI('dark');
+      } else {
+        document.body.classList.remove('dark-mode');
+        updateThemeUI('light');
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.body.classList.toggle('dark-mode');
+      const theme = isDark ? 'dark' : 'light';
+      localStorage.setItem('warobh_theme', theme);
+      updateThemeUI(theme);
+    }
+
+    function updateThemeUI(theme) {
+      const icon = document.getElementById('themeIcon');
+      const text = document.getElementById('themeText');
+      if (theme === 'dark') {
+        if (icon) icon.innerText = '☀️';
+        if (text) text.innerText = 'Mode Terang';
+      } else {
+        if (icon) icon.innerText = '🌙';
+        if (text) text.innerText = 'Mode Gelap';
+      }
+    }
+
     function gantiBgLogin(tipe) {
       const overlay = document.getElementById('loginOverlay');
       if (!overlay) return;
@@ -1203,6 +1341,21 @@
       }
     }
 
+    // MEMUAT DAN MENYIMPAN INGAT SAYA (REMEMBER ME)
+    function loadSavedLoginCredentials() {
+      const savedCreds = localStorage.getItem('warobh_remember_credentials');
+      if (savedCreds) {
+        try {
+          const creds = JSON.parse(savedCreds);
+          document.getElementById('loginUsername').value = creds.username || '';
+          document.getElementById('loginPassword').value = creds.password || '';
+          document.getElementById('rememberMe').checked = true;
+        } catch (e) {
+          console.error("Gagal memuat kredensial tersimpan", e);
+        }
+      }
+    }
+
     function checkSession() {
       const activeUser = JSON.parse(sessionStorage.getItem('active_user'));
       const loginOverlay = document.getElementById('loginOverlay');
@@ -1223,6 +1376,7 @@
       } else {
         loginOverlay.style.display = 'flex';
         userBar.style.display = 'none';
+        loadSavedLoginCredentials();
       }
     }
 
@@ -1230,18 +1384,25 @@
       e.preventDefault();
       const u = document.getElementById('loginUsername').value.trim();
       const p = document.getElementById('loginPassword').value.trim();
+      const remember = document.getElementById('rememberMe').checked;
       const errBox = document.getElementById('loginError');
 
       const foundUser = USERS.find(user => user.username === u && user.password === p);
 
       if (foundUser) {
         errBox.style.display = 'none';
+        
+        if (remember) {
+          localStorage.setItem('warobh_remember_credentials', JSON.stringify({ username: u, password: p }));
+        } else {
+          localStorage.removeItem('warobh_remember_credentials');
+        }
+
         sessionStorage.setItem('active_user', JSON.stringify({
           username: foundUser.username,
           role: foundUser.role
         }));
-        document.getElementById('loginUsername').value = '';
-        document.getElementById('loginPassword').value = '';
+        
         checkSession();
       } else {
         errBox.style.display = 'block';
@@ -1333,21 +1494,18 @@
       document.getElementById('totalBayar').innerText = 'Rp ' + grandTotal.toLocaleString('id-ID');
     }
 
-    async function autofillFromMaster(input, type) {
+    function autofillFromMaster(input, type) {
       const val = input.value.trim().toLowerCase();
       const row = input.closest('tr');
 
       if (!val) return;
 
-      let field = type === 'kode' ? 'kode_barang' : 'nama_barang';
-      const { data: foundList } = await supabaseClient
-        .from('master_barang')
-        .select('*')
-        .ilike(field, val)
-        .limit(1);
+      const found = localMasterBarang.find(item => {
+        if (type === 'kode') return String(item.kode_barang || '').toLowerCase() === val;
+        return String(item.nama_barang || '').toLowerCase() === val;
+      });
 
-      if (foundList && foundList.length > 0) {
-        const found = foundList[0];
+      if (found) {
         row.querySelector('.item-kode').value = found.kode_barang || '';
         row.querySelector('.item-nama').value = found.nama_barang || '';
         row.querySelector('.item-harga').value = found.harga_satuan || 0;
@@ -1355,36 +1513,71 @@
       }
     }
 
-    async function renderMasterDatalist() {
+    async function fetchMasterData() {
+      try {
+        const res = await apiGet("read_master");
+        localMasterBarang = res.data || [];
+      } catch (err) {
+        console.error("Gagal membaca Master Data dari Google Sheets", err);
+      }
+    }
+
+    function updateMasterDatalistOptions() {
       const dlKode = document.getElementById('listKodeBarangMaster');
       const dlNama = document.getElementById('listNamaBarangMaster');
-      const tbody = document.getElementById('tabelMasterBarang');
-      const searchKey = (document.getElementById('searchMasterInput')?.value || '').toLowerCase().trim();
+      if (!dlKode || !dlNama) return;
 
       dlKode.innerHTML = '';
       dlNama.innerHTML = '';
+
+      localMasterBarang.forEach(item => {
+        if (item.kode_barang) dlKode.innerHTML += `<option value="${item.kode_barang}">`;
+        if (item.nama_barang) dlNama.innerHTML += `<option value="${item.nama_barang}">`;
+      });
+    }
+
+    async function renderMasterDatalist() {
+      await fetchMasterData();
+      updateMasterDatalistOptions();
+      tampilkanMasterData(1);
+    }
+
+    function tampilkanMasterData(page = 1) {
+      currentMasterPage = page;
+      const tbody = document.getElementById('tabelMasterBarang');
+      const searchKey = (document.getElementById('searchMasterInput')?.value || '').toLowerCase().trim();
+
+      if (!tbody) return;
       tbody.innerHTML = '';
 
-      let query = supabaseClient.from('master_barang').select('*').order('kode_barang', { ascending: true });
+      let masterBarang = localMasterBarang;
       if (searchKey) {
-        query = query.or(`kode_barang.ilike.%${searchKey}%,nama_barang.ilike.%${searchKey}%`);
+        masterBarang = masterBarang.filter(i => 
+          String(i.kode_barang || '').toLowerCase().includes(searchKey) || 
+          String(i.nama_barang || '').toLowerCase().includes(searchKey)
+        );
       }
 
-      const { data: masterBarang, error } = await query;
+      const totalItems = masterBarang.length;
+      const totalPages = Math.ceil(totalItems / masterRowsPerPage) || 1;
 
-      if (error || !masterBarang || masterBarang.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="color: var(--text-muted); padding: 12px;">Belum ada Master Data Barang di Cloud.</td></tr>';
+      if (currentMasterPage > totalPages) currentMasterPage = totalPages;
+      if (currentMasterPage < 1) currentMasterPage = 1;
+
+      const startIndex = (currentMasterPage - 1) * masterRowsPerPage;
+      const pageData = masterBarang.slice(startIndex, startIndex + masterRowsPerPage);
+
+      if (pageData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="color: var(--text-muted); padding: 12px;">Belum ada Master Data Barang di Google Sheets.</td></tr>';
+        renderMasterPagination(0, 1);
         return;
       }
 
-      masterBarang.forEach((item, index) => {
-        if (item.kode_barang) dlKode.innerHTML += `<option value="${item.kode_barang}">`;
-        if (item.nama_barang) dlNama.innerHTML += `<option value="${item.nama_barang}">`;
-
+      pageData.forEach((item, index) => {
         if (editingMasterKode === item.kode_barang) {
           tbody.innerHTML += `
             <tr>
-              <td class="text-center">${index + 1}</td>
+              <td class="text-center">${startIndex + index + 1}</td>
               <td><input type="text" id="editMasterKode" value="${item.kode_barang || ''}" disabled></td>
               <td><input type="text" id="editMasterNama" value="${item.nama_barang || ''}"></td>
               <td><input type="number" id="editMasterHarga" class="text-right" value="${item.harga_satuan || 0}"></td>
@@ -1399,7 +1592,7 @@
         } else {
           tbody.innerHTML += `
             <tr>
-              <td class="text-center">${index + 1}</td>
+              <td class="text-center">${startIndex + index + 1}</td>
               <td><span class="badge-code">${item.kode_barang || '-'}</span></td>
               <td style="font-weight: 600;">${item.nama_barang || '-'}</td>
               <td class="text-right" style="font-weight: 700;">Rp ${Number(item.harga_satuan || 0).toLocaleString('id-ID')}</td>
@@ -1413,6 +1606,37 @@
           `;
         }
       });
+
+      renderMasterPagination(totalItems, totalPages);
+    }
+
+    function renderMasterPagination(totalItems, totalPages) {
+      const infoContainer = document.getElementById('paginationMasterInfo');
+      const btnContainer = document.getElementById('paginationMasterButtons');
+
+      if (!infoContainer || !btnContainer) return;
+
+      if (totalItems === 0) {
+        infoContainer.innerText = 'Menampilkan 0 barang';
+        btnContainer.innerHTML = '';
+        return;
+      }
+
+      const start = (currentMasterPage - 1) * masterRowsPerPage + 1;
+      const end = Math.min(currentMasterPage * masterRowsPerPage, totalItems);
+      infoContainer.innerText = `Menampilkan ${start}-${end} dari ${totalItems} Master Barang`;
+
+      let htmlBtns = '';
+
+      htmlBtns += `<button class="page-btn" ${currentMasterPage === 1 ? 'disabled' : ''} onclick="tampilkanMasterData(${currentMasterPage - 1})">← Prev</button>`;
+
+      for (let i = 1; i <= totalPages; i++) {
+        htmlBtns += `<button class="page-btn ${i === currentMasterPage ? 'active' : ''}" onclick="tampilkanMasterData(${i})">${i}</button>`;
+      }
+
+      htmlBtns += `<button class="page-btn" ${currentMasterPage === totalPages ? 'disabled' : ''} onclick="tampilkanMasterData(${currentMasterPage + 1})">Next →</button>`;
+
+      btnContainer.innerHTML = htmlBtns;
     }
 
     async function tambahMasterBarangManual() {
@@ -1425,30 +1649,31 @@
         return;
       }
 
-      const { error } = await supabaseClient.from('master_barang').insert([
-        { kode_barang: kode, nama_barang: nama, harga_satuan: harga }
-      ]);
+      const res = await apiPost({
+        action: "upsert_master",
+        payload: [{ kode_barang: kode, nama_barang: nama, harga_satuan: harga }]
+      });
 
-      if (error) {
-        alert("Gagal menambahkan barang: " + error.message);
-      } else {
+      if (res.status === 'success') {
         document.getElementById('masterInputKode').value = '';
         document.getElementById('masterInputNama').value = '';
         document.getElementById('masterInputHarga').value = '';
 
-        renderMasterDatalist();
-        alert("Barang berhasil disimpan di Cloud Supabase!");
+        await renderMasterDatalist();
+        alert("Barang berhasil disimpan di Google Sheets!");
+      } else {
+        alert("Gagal menambahkan barang!");
       }
     }
 
     function aktifkanEditMasterBarang(kodeBarang) {
       editingMasterKode = kodeBarang;
-      renderMasterDatalist();
+      tampilkanMasterData(currentMasterPage);
     }
 
     function batalEditMasterBarang() {
       editingMasterKode = null;
-      renderMasterDatalist();
+      tampilkanMasterData(currentMasterPage);
     }
 
     async function simpanEditMasterBarang(kodeBarang) {
@@ -1460,25 +1685,25 @@
         return;
       }
 
-      const { error } = await supabaseClient
-        .from('master_barang')
-        .update({ nama_barang: nama, harga_satuan: harga })
-        .eq('kode_barang', kodeBarang);
+      const res = await apiPost({
+        action: "upsert_master",
+        payload: [{ kode_barang: kodeBarang, nama_barang: nama, harga_satuan: harga }]
+      });
 
-      if (error) {
-        alert("Gagal memperbarui data: " + error.message);
-      } else {
+      if (res.status === 'success') {
         editingMasterKode = null;
-        renderMasterDatalist();
-        alert("Data master barang Cloud berhasil diubah!");
+        await renderMasterDatalist();
+        alert("Data master barang Google Sheets berhasil diubah!");
+      } else {
+        alert("Gagal memperbarui data!");
       }
     }
 
     async function hapusMasterBarangSatu(kodeBarang) {
-      if (confirm("Apakah Anda yakin ingin menghapus barang ini dari Cloud Master Database?")) {
-        await supabaseClient.from('master_barang').delete().eq('kode_barang', kodeBarang);
+      if (confirm("Apakah Anda yakin ingin menghapus barang ini dari Master Database?")) {
+        await apiPost({ action: "delete_master_item", kode_barang: kodeBarang });
         if (editingMasterKode === kodeBarang) editingMasterKode = null;
-        renderMasterDatalist();
+        await renderMasterDatalist();
       }
     }
 
@@ -1520,10 +1745,10 @@
           });
 
           if (masterPayload.length > 0) {
-            const { error } = await supabaseClient.from('master_barang').upsert(masterPayload);
-            if (!error) {
-              renderMasterDatalist();
-              alert(`Berhasil mengimpor ${masterPayload.length} Master Data Barang ke Cloud!`);
+            const res = await apiPost({ action: "upsert_master", payload: masterPayload });
+            if (res.status === 'success') {
+              await renderMasterDatalist();
+              alert(`Berhasil mengimpor ${masterPayload.length} Master Data Barang ke Google Sheets!`);
             }
           }
         } catch (error) {
@@ -1536,11 +1761,78 @@
       reader.readAsArrayBuffer(file);
     }
 
+    // EXPORT DATA BARANG (MASTER DATABASE)
+    async function exportMasterExcel() {
+      if (!localMasterBarang || localMasterBarang.length === 0) {
+        alert("Tidak ada data Master Barang untuk diexport!");
+        return;
+      }
+
+      const workbook = new ExcelJS.Workbook();
+      const ws = workbook.addWorksheet('Master Barang');
+
+      ws.getColumn('A').width = 8;
+      ws.getColumn('B').width = 20;
+      ws.getColumn('C').width = 40;
+      ws.getColumn('D').width = 22;
+
+      const borderThin = {
+        top: { style: 'thin', color: { argb: 'FF334155' } }, 
+        left: { style: 'thin', color: { argb: 'FF334155' } }, 
+        bottom: { style: 'thin', color: { argb: 'FF334155' } }, 
+        right: { style: 'thin', color: { argb: 'FF334155' } }
+      };
+
+      ws.mergeCells('A1:D1');
+      const titleCell = ws.getCell('A1');
+      titleCell.value = "DATABASE MASTER BARANG - WAROBH PERCETAKAN";
+      titleCell.font = { name: 'Plus Jakarta Sans', size: 14, bold: true, color: { argb: 'FFFFFFFF' } };
+      titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLOR_PRIMARY } };
+      titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+
+      const headers = ["No", "Kode Barang", "Nama Barang", "Harga Satuan (Rp)"];
+      headers.forEach((h, idx) => {
+        const colLetter = String.fromCharCode(65 + idx);
+        const cell = ws.getCell(`${colLetter}3`);
+        cell.value = h;
+        cell.font = { name: 'Plus Jakarta Sans', bold: true, color: { argb: 'FFFFFFFF' } };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLOR_PRIMARY } };
+        cell.alignment = { horizontal: idx === 3 ? 'right' : (idx === 0 ? 'center' : 'left') };
+        cell.border = borderThin;
+      });
+
+      localMasterBarang.forEach((item, idx) => {
+        const rowNum = idx + 4;
+        ws.getCell(`A${rowNum}`).value = idx + 1;
+        ws.getCell(`B${rowNum}`).value = item.kode_barang || '';
+        ws.getCell(`C${rowNum}`).value = item.nama_barang || '';
+        ws.getCell(`D${rowNum}`).value = Number(item.harga_satuan || 0);
+
+        ws.getCell(`A${rowNum}`).alignment = { horizontal: 'center' };
+        ws.getCell(`B${rowNum}`).alignment = { horizontal: 'left' };
+        ws.getCell(`C${rowNum}`).alignment = { horizontal: 'left' };
+        ws.getCell(`D${rowNum}`).alignment = { horizontal: 'right' };
+        ws.getCell(`D${rowNum}`).numFmt = '#,##0';
+
+        ['A','B','C','D'].forEach(col => {
+          const cell = ws.getCell(`${col}${rowNum}`);
+          cell.border = borderThin;
+          if (idx % 2 === 1) {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLOR_STRIPE } };
+          }
+        });
+      });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      saveAs(blob, `Master_Database_Barang_WAROBH_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    }
+
     async function hapusMasterData() {
-      if (confirm("Yakin ingin menghapus seluruh Master Data Barang di Cloud?")) {
-        await supabaseClient.from('master_barang').delete().neq('kode_barang', '');
+      if (confirm("Yakin ingin menghapus seluruh Master Data Barang di Google Sheets?")) {
+        await apiPost({ action: "delete_all_master" });
         editingMasterKode = null;
-        renderMasterDatalist();
+        await renderMasterDatalist();
       }
     }
 
@@ -1622,25 +1914,20 @@
         total_bayar: data.totalBayar
       };
 
-      const { error } = await supabaseClient.from('invoices').upsert([payload]);
+      const res = await apiPost({ action: "upsert_invoice", payload: payload });
 
-      if (error) {
-        alert("Gagal menyimpan ke Cloud Supabase: " + error.message);
-      } else {
-        alert("Data Invoice berhasil disimpan di Cloud!");
-        tampilkanData(1);
+      if (res.status === 'success') {
+        alert("Data Invoice berhasil disimpan di Google Sheets!");
+        await tampilkanData(1);
         resetForm();
+      } else {
+        alert("Gagal menyimpan ke Google Sheets!");
       }
     }
 
     async function editData(noInvoice) {
-      const { data: item, error } = await supabaseClient
-        .from('invoices')
-        .select('*')
-        .eq('no_invoice', noInvoice)
-        .single();
-
-      if (error || !item) return;
+      const item = localInvoices.find(i => String(i.no_invoice) === String(noInvoice));
+      if (!item) return;
 
       editIndexNo = noInvoice;
 
@@ -1669,7 +1956,18 @@
       resetForm();
     }
 
+    async function fetchInvoicesData() {
+      try {
+        const res = await apiGet("read_invoices");
+        localInvoices = res.data || [];
+      } catch (err) {
+        console.error("Gagal membaca daftar Invoice dari Google Sheets", err);
+      }
+    }
+
     async function tampilkanData(page = 1) {
+      await fetchInvoicesData();
+
       currentPage = page;
       const tbody = document.getElementById('tabelSimpan');
       const keyword = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
@@ -1677,16 +1975,7 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      let { data: listData, error } = await supabaseClient
-        .from('invoices')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error || !listData) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center" style="color: var(--btn-red); padding: 12px;">Gagal memuat data dari Cloud!</td></tr>';
-        renderPagination(0, 1, 0);
-        return;
-      }
+      let listData = localInvoices;
 
       if (keyword) {
         listData = listData.filter(item => {
@@ -1712,7 +2001,7 @@
       const pageData = listData.slice(startIndex, startIndex + rowsPerPage);
 
       if (pageData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center" style="color: var(--text-muted); padding: 12px;">Belum ada data tersimpan di Cloud</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center" style="color: var(--text-muted); padding: 12px;">Belum ada data tersimpan di Google Sheets</td></tr>';
         renderPagination(0, 1, 0);
         return;
       }
@@ -1877,72 +2166,111 @@
         cell.border = borderThin;
       });
 
-      const notesRow = currentRow + 2;
-      ws.mergeCells(`A${notesRow}:C${notesRow+2}`);
-      const notesCell = ws.getCell(`A${notesRow}`);
-      notesCell.value = "Catatan:\n- Barang dibeli tidak dapat ditukar/dikembalikan\n- Pembatalan hanya sebelum proses produksi\n- Kesalahan desain di luar tanggung jawab percetakan";
-      notesCell.font = { name: 'Plus Jakarta Sans', size: 9, italic: true };
-      notesCell.alignment = { wrapText: true, vertical: 'top' };
-
-      const sigRow = notesRow + 4;
-      ws.getCell(`A${sigRow}`).value = "Penerima / Pembeli";
-      ws.getCell(`A${sigRow}`).font = { name: 'Plus Jakarta Sans', bold: true };
-      ws.getCell(`F${sigRow}`).value = "Hormat Kami";
-      ws.getCell(`F${sigRow}`).font = { name: 'Plus Jakarta Sans', bold: true };
-
       const buffer = await workbook.xlsx.writeBuffer();
-      saveAs(new Blob([buffer]), filename);
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      saveAs(blob, filename);
     }
 
     function unduhExcelLangsung() {
       const data = getFormData();
-      generateFormExcel(data, `Invoice_${data.noInvoice || 'Form'}.xlsx`);
+      if (!data.noInvoice) {
+        alert("Harap isi No. Invoice!");
+        return;
+      }
+      generateFormExcel(data, `Invoice_${data.noInvoice}.xlsx`);
     }
 
-    async function unduhSingleExcelCloud(noInvoice) {
-      const { data: item } = await supabaseClient.from('invoices').select('*').eq('no_invoice', noInvoice).single();
-      if (item) {
-        generateFormExcel(item, `Invoice_${item.no_invoice}.xlsx`);
-      }
+    function unduhSingleExcelCloud(noInvoice) {
+      const item = localInvoices.find(i => String(i.no_invoice) === String(noInvoice));
+      if (!item) return;
+      generateFormExcel(item, `Invoice_${item.no_invoice}.xlsx`);
     }
 
     async function unduhSemuaExcel() {
-      const { data: listData } = await supabaseClient.from('invoices').select('*').order('created_at', { ascending: false });
-      if (!listData || listData.length === 0) {
-        alert("Tidak ada data untuk diunduh!");
+      if (!localInvoices || localInvoices.length === 0) {
+        alert("Tidak ada data tersimpan untuk diunduh!");
         return;
       }
 
       const workbook = new ExcelJS.Workbook();
-      const ws = workbook.addWorksheet('Rekap Invoice');
+      const ws = workbook.addWorksheet('Rekap Invoices');
 
-      ws.columns = [
-        { header: 'No', key: 'no', width: 6 },
-        { header: 'No. Invoice', key: 'noInvoice', width: 18 },
-        { header: 'Tanggal Nota', key: 'tglNota', width: 15 },
-        { header: 'Pelanggan', key: 'ythTuanNy', width: 20 },
-        { header: 'Total QTY', key: 'totalQty', width: 12 },
-        { header: 'GRAND TOTAL', key: 'totalBayar', width: 18 },
-        { header: 'Waktu Simpan', key: 'waktuSimpan', width: 20 }
-      ];
+      ws.getColumn('A').width = 6;
+      ws.getColumn('B').width = 18;
+      ws.getColumn('C').width = 14;
+      ws.getColumn('D').width = 24;
+      ws.getColumn('E').width = 45;
+      ws.getColumn('F').width = 10;
+      ws.getColumn('G').width = 20;
 
-      ws.getRow(1).font = { name: 'Plus Jakarta Sans', bold: true, color: { argb: 'FFFFFF' } };
-      ws.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLOR_PRIMARY } };
+      const borderThin = {
+        top: { style: 'thin', color: { argb: 'FF334155' } }, 
+        left: { style: 'thin', color: { argb: 'FF334155' } }, 
+        bottom: { style: 'thin', color: { argb: 'FF334155' } }, 
+        right: { style: 'thin', color: { argb: 'FF334155' } }
+      };
 
-      listData.forEach((item, index) => {
-        ws.addRow({
-          no: index + 1,
-          noInvoice: item.no_invoice,
-          tglNota: item.tgl_nota,
-          ythTuanNy: item.pelanggan,
-          totalQty: item.total_qty,
-          totalBayar: item.total_bayar,
-          waktuSimpan: item.created_at
+      ws.mergeCells('A1:G1');
+      const titleCell = ws.getCell('A1');
+      titleCell.value = "REKAP DATA INVOICE PEMBAYARAN - WAROBH";
+      titleCell.font = { name: 'Plus Jakarta Sans', size: 14, bold: true, color: { argb: 'FFFFFFFF' } };
+      titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLOR_PRIMARY } };
+      titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+
+      const headers = ["No", "No. Invoice", "Tanggal", "Pelanggan", "Rincian Barang", "Total QTY", "Grand Total (Rp)"];
+      headers.forEach((h, idx) => {
+        const colLetter = String.fromCharCode(65 + idx);
+        const cell = ws.getCell(`${colLetter}3`);
+        cell.value = h;
+        cell.font = { name: 'Plus Jakarta Sans', bold: true, color: { argb: 'FFFFFFFF' } };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLOR_PRIMARY } };
+        cell.alignment = { horizontal: idx === 6 ? 'right' : (idx === 0 || idx === 5 ? 'center' : 'left') };
+        cell.border = borderThin;
+      });
+
+      localInvoices.forEach((item, idx) => {
+        const rowNum = idx + 4;
+        const rincianText = (item.items || []).map(i => `${i.kodeBarang ? '['+i.kodeBarang+'] ' : ''}${i.namaBarang} (${i.qty} x Rp ${Number(i.hargaSatuan||0).toLocaleString('id-ID')})`).join('; ');
+
+        ws.getCell(`A${rowNum}`).value = idx + 1;
+        ws.getCell(`B${rowNum}`).value = item.no_invoice || '';
+        ws.getCell(`C${rowNum}`).value = item.tgl_nota || '';
+        ws.getCell(`D${rowNum}`).value = item.pelanggan || '';
+        ws.getCell(`E${rowNum}`).value = rincianText;
+        ws.getCell(`F${rowNum}`).value = item.total_qty || 0;
+        ws.getCell(`G${rowNum}`).value = item.total_bayar || 0;
+
+        ws.getCell(`A${rowNum}`).alignment = { horizontal: 'center' };
+        ws.getCell(`F${rowNum}`).alignment = { horizontal: 'center' };
+        ws.getCell(`G${rowNum}`).alignment = { horizontal: 'right' };
+        ws.getCell(`G${rowNum}`).numFmt = '#,##0';
+
+        ['A','B','C','D','E','F','G'].forEach(col => {
+          const cell = ws.getCell(`${col}${rowNum}`);
+          cell.border = borderThin;
+          if (idx % 2 === 1) {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLOR_STRIPE } };
+          }
         });
       });
 
       const buffer = await workbook.xlsx.writeBuffer();
-      saveAs(new Blob([buffer]), `Rekap_Invoice_${new Date().getTime()}.xlsx`);
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      saveAs(blob, `Rekap_Invoice_WAROBH_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    }
+
+    async function hapusSatuData(noInvoice) {
+      if (confirm(`Yakin ingin menghapus Invoice ${noInvoice} dari Google Sheets?`)) {
+        await apiPost({ action: "delete_invoice_item", no_invoice: noInvoice });
+        await tampilkanData(currentPage);
+      }
+    }
+
+    async function hapusSemuaData() {
+      if (confirm("Yakin ingin menghapus SELURUH data Invoice tersimpan di Google Sheets?")) {
+        await apiPost({ action: "delete_all_invoices" });
+        await tampilkanData(1);
+      }
     }
 
     async function importExcelData(event) {
@@ -1954,13 +2282,11 @@
         try {
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, { type: 'array' });
-          const firstSheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[firstSheetName];
-
-          const jsonRows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonRows = XLSX.utils.sheet_to_json(firstSheet, { defval: "" });
 
           if (jsonRows.length === 0) {
-            alert("File Excel kosong atau format tidak sesuai!");
+            alert("File kosong!");
             return;
           }
 
@@ -1973,72 +2299,70 @@
             return "";
           };
 
-          let payload = [];
+          let invoiceMap = {};
+
           jsonRows.forEach(row => {
-            const noInv = String(getVal(row, "No. Invoice", "No Invoice", "noInvoice") || "");
-            if (noInv) {
-              payload.push({
+            const noInv = String(getVal(row, "No. Invoice", "No Invoice", "no_invoice") || "").trim();
+            if (!noInv) return;
+
+            const tgl = String(getVal(row, "Tanggal", "Tanggal Nota", "tgl_nota") || "").trim();
+            const pel = String(getVal(row, "Pelanggan", "pelanggan") || "").trim();
+            const kode = String(getVal(row, "Kode Barang", "kodeBarang") || "").trim();
+            const nama = String(getVal(row, "Nama Barang", "namaBarang") || "").trim();
+            const harga = parseFloat(getVal(row, "Harga Satuan", "hargaSatuan") || 0);
+            const qty = parseFloat(getVal(row, "QTY", "qty") || 0);
+
+            if (!invoiceMap[noInv]) {
+              invoiceMap[noInv] = {
                 no_invoice: noInv,
-                tgl_nota: String(getVal(row, "Tanggal Nota", "Tgl Nota", "tglNota") || null),
-                pelanggan: String(getVal(row, "Pelanggan", "Yth. Tuan/Ny", "Tuan/Ny", "ythTuanNy") || ""),
-                items: [
-                  {
-                    kodeBarang: String(getVal(row, "Kode Barang", "Kode", "kodeBarang") || ""),
-                    namaBarang: String(getVal(row, "Nama Barang", "namaBarang") || "Barang Import"),
-                    hargaSatuan: parseFloat(getVal(row, "Harga Satuan", "hargaSatuan") || 0),
-                    qty: parseFloat(getVal(row, "QTY", "Jumlah Barang", "qty") || 1),
-                    jumlah: parseFloat(getVal(row, "GRAND TOTAL", "Jumlah") || 0)
-                  }
-                ],
-                total_qty: parseFloat(getVal(row, "Total QTY", "QTY") || 1),
-                total_bayar: parseFloat(getVal(row, "GRAND TOTAL", "TOTAL") || 0)
+                tgl_nota: tgl,
+                pelanggan: pel,
+                items: [],
+                total_qty: 0,
+                total_bayar: 0
+              };
+            }
+
+            if (nama || kode) {
+              const jumlah = harga * qty;
+              invoiceMap[noInv].items.push({
+                kodeBarang: kode,
+                namaBarang: nama,
+                hargaSatuan: harga,
+                qty: qty,
+                jumlah: jumlah
               });
+              invoiceMap[noInv].total_qty += qty;
+              invoiceMap[noInv].total_bayar += jumlah;
             }
           });
 
-          if (payload.length > 0) {
-            const { error } = await supabaseClient.from('invoices').upsert(payload);
-            if (!error) {
-              tampilkanData(1);
-              alert(`Berhasil mengimpor ${payload.length} data Invoice ke Cloud!`);
-            }
+          const payloadList = Object.values(invoiceMap);
+          for (let item of payloadList) {
+            await apiPost({ action: "upsert_invoice", payload: item });
           }
-        } catch (error) {
-          console.error(error);
+
+          await tampilkanData(1);
+          alert(`Berhasil mengimpor ${payloadList.length} Invoice ke Google Sheets!`);
+        } catch (err) {
+          console.error(err);
           alert("Gagal membaca file Excel!");
         } finally {
           event.target.value = '';
         }
       };
-
       reader.readAsArrayBuffer(file);
     }
 
-    async function hapusSatuData(noInvoice) {
-      if (confirm("Yakin ingin menghapus data ini dari Cloud?")) {
-        await supabaseClient.from('invoices').delete().eq('no_invoice', noInvoice);
-        if (editIndexNo === noInvoice) {
-          resetForm();
-        }
-        tampilkanData(currentPage);
-      }
-    }
-
-    async function hapusSemuaData() {
-      if (confirm("Yakin ingin menghapus seluruh data Invoice di Cloud?")) {
-        await supabaseClient.from('invoices').delete().neq('no_invoice', '');
-        resetForm();
-        tampilkanData(1);
-      }
-    }
-
-    window.onload = function() {
+    // EVENT LISTENERS & INITIALIZATION
+    window.onload = async function() {
+      initTheme();
       loadSavedLoginBg();
       checkSession();
-      renderMasterDatalist();
-      tambahBarisItem();
-      tampilkanData(1);
       generateNoInvoice();
+      tambahBarisItem();
+      await renderMasterDatalist();
+      await tampilkanData(1);
     };
   </script>
 </body>
